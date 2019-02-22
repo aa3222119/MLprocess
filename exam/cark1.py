@@ -30,7 +30,9 @@ res = json.loads(r.text)
 # ----------------------------------------------------------------------------------------------------------------
 import os
 cmd_win = 'dir G:\\KuGou /b /a /s | find ".mp4"'
-cmd_cp = 'xcopy /h /fy "%s" G:\\KuGou\\tmp\\'
+out_dir = 'G:\\KuGou\\tmp\\'
+# out_dir = '此电脑\Redmi 5 Plus\内部存储设备\data\\'
+cmd_cp = 'xcopy /h /fy "%s" ' + out_dir
 file_list = os.popen(cmd_win).read().strip().split('\n')
 import random
 for i in range(56):
@@ -40,6 +42,34 @@ for i in range(56):
     print(cmd_,)
     print(os.popen(cmd_))
 
+##
+import os, time
+import cv2
+
+
+def devide_v(ss, t, file, postfix='.wmv'):
+    cmd = 'ffmpeg -ss %s -t %s -accurate_seek -i "%s" -codec copy "%s"'
+    input_f = file + postfix
+    output_f = file + 'cut' + time.strftime('%Y%m%d_%H%M%S') + postfix
+    print(os.popen(cmd %(ss, t, input_f, output_f)).read())
+    # os.popen(output_f).read()
+    return output_f
+
+
+os.chdir('F:\迅雷下载\\16278482\Western&HD-Jiggly@LegsJapan Complete MegaPack 2013 1080p')
+of = devide_v('00:00:49.03', 44, 'Western&HD-Jiggly@[2013.0717]LegsJapan Putting On Black Net Nights{Natsuki Yokoyama}')
+cap = cv2.VideoCapture(of)
+cv2.namedWindow("frame", 0)
+# cv2.resizeWindow("frame", 640, 480)
+ret = True
+while (ret):
+    ret, frame = cap.read()
+    cv2.imshow('frame', frame)  # 一个窗口用以显示原视频
+    cv2.resizeWindow("enhanced", 640, 480)
+    if cv2.waitKey(1) & 0xFF == ord('q'):
+        break
+cap.release()
+cv2.destroyAllWindows()
 
 # ----------------------------------------------------------------------------------------------------------------
 import cv2,time
@@ -49,7 +79,7 @@ cap = cv2.VideoCapture(0)
 #opencv3的话用:fourcc = cv2.VideoWriter_fourcc(*'XVID')
 # out = cv2.VideoWriter('output.avi',fourcc,20.0,(640,480))#保存视频
 while True:
-    ret,frame = cap.read()
+    ret, frame = cap.read()
     cv2.imshow('frame',frame)  # 一个窗口用以显示原视频
     time.sleep(0.1)
     if cv2.waitKey(1) &0xFF == ord('q'):
