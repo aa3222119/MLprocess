@@ -112,7 +112,9 @@ class SortedArrayHot:
 
 
 class ConfusionMatrix:
-
+    # 对于二分类问题适用
+    # y_label 原始标签    y_pre 模型预测值
+    # th 分类阈值
     def __init__(self, y_label, y_pre):
         self.label = y_label.copy()
         self.pre = y_pre.copy()
@@ -124,33 +126,55 @@ class ConfusionMatrix:
     def acc(self, th=0.5):  # 精确率、准确率 Accuracy
         y_l = np.zeros(self.label.shape)
         y_l[self.pre > th] = 1
-        return self.label[self.label == y_l].shape[0]/self.label.shape[0]
+        return self.label[self.label == y_l].shape[0] / self.label.shape[0]
 
-    def precision(self, th=0.5):  # 精准率、查准率
+    def prec(self, th=0.5):  # 精准率、查准率
         y_l = np.zeros(self.label.shape)
         y_l[self.pre > th] = 1
-        return self.label[(self.label == y_l) & (y_l == 1)].shape[0] / self.label[y_l == 1].shape[0]
+        denomi = self.label[y_l == 1].shape[0]  # 分母
+        return self.label[(self.label == y_l) & (y_l == 1)].shape[0] / denomi if denomi > 0 else 0
 
-    def tpr(self, th=0.5):   # 真正例率 所有正样本中 也是常说的召回率
+    def tpr(self, th=0.5):   # 真正例率 所有正样本中 也是常说的召回率 recall
         y_l = np.zeros(self.label.shape)
         y_l[self.pre > th] = 1
-        return self.label[(self.label == y_l) & (self.label == 1)].shape[0] / self.label[self.label == 1].shape[0]
+        denomi = self.label[self.label == 1].shape[0]
+        return self.label[(self.label == y_l) & (self.label == 1)].shape[0] / denomi if denomi > 0 else 0
 
     def tnr(self, th=0.5):  # 真负例率 所有负样本中
         y_l = np.zeros(self.label.shape)
         y_l[self.pre > th] = 1
-        return self.label[(self.label == y_l) & (self.label == 0)].shape[0] / self.label[self.label == 0].shape[0]
+        denomi = self.label[self.label == 0].shape[0]
+        return self.label[(self.label == y_l) & (self.label == 0)].shape[0] / denomi if denomi > 0 else 0
 
     def fpr(self, th=0.5):   # 假正例率 所有负样本中
         return 1 - self.tnr(th)
 
     def fb_score(self, th=0.5, beta=1):  # balanced F Score 默认beta=1为f1_score
-        prec = self.precision(th)  # Accuracy
+        prec = self.prec(th)  # Accuracy
         rec = self.tpr(th)  # recall
-        b2 = beta**2  #
-        return (1 + b2)*prec*rec/(rec + b2*prec)
+        b2 = beta**2  # beta 越大说明越看重recall 既说明漏报的成本更高
+        if rec == prec == 0:
+            return 0
+        else:
+            return (1 + b2)*prec*rec/(rec + b2*prec)
 
-    def auc(self):  # 一种AUC的计算方式
+    def find_max_fb_th(self, beta=1, th_step=0.001):
+        # 找到某模型下最大的fb_score以及对应阈值th 需限定F分数的beta值
+        # 参照fb_score函数的注释理解
+        fb, th, fb_out, th_out = 0, 1, 0, 1
+        while th >= 0:
+            fb = self.fb_score(th, beta)
+            if fb > fb_out:
+                fb_out, th_out = fb, th
+            th -= th_step
+        return fb_out, th_out
+
+    def auc(self):
+        # 一种AUC的计算方式 矩分面积计算法 大致思路：
+        #  auc_value为最后输出的面积值，初始值为1，采用排序后样本的结果来抵扣的方式：
+        #   按预测值排序sorted_ind，挨个看每个样本置为1，是进入了TP的集合还是FN，
+        #   如果是FN扣除相应的面积，如果是TP，则下次扣除的面积会更少(positive_pool变多)
+        #   基本面积单位： positive_part negative_part 由正负例的样本数量决定 其实用手画一画ROC的图就蛮好理解了。
         sorted_ind = np.argsort(self.pre)[::-1]
         auc_value, positive_pool = 1, 0
         positive_len, samples_len = self.label[self.label == 1].shape[0], self.label.shape[0]
@@ -163,9 +187,13 @@ class ConfusionMatrix:
                 auc_value -= negative_part*(1-positive_pool)
         return auc_value
 
-    def status_p(self):
-        return f'''Accuracy:{self.acc()}| precision:{self.precision()}| recall:{self.tpr()}| fpr:{self.fpr()}
-        fb_score:{self.fb_score()}| AUC:{self.auc()}'''
+    def status_p(self, th=0.5):
+        return f'''Accuracy:{self.acc(th):#.3f}| precision:{self.prec(th):#.3f}| recall:{self.tpr(th):#.3f}
+        fb_score:{self.fb_score(th):#.3f}| fpr:{self.fpr(th):#.3f} | AUC:{self.auc():#.3f}'''
+
+    def status_fb(self, th=0.5):
+        acc, prec, tpr, f1 = self.acc(th), self.prec(th), self.tpr(th), self.fb_score(th)
+        return f'''Acc:{acc:#.3f}| prec:{prec:#.3f}| recall:{tpr:#.3f}| f1_score:{f1:#.3f}'''
 
 
 if __name__ == '__main__':
