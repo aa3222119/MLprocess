@@ -38,13 +38,12 @@ out_dir = 'G:\\KuGou\\tmp\\'
 cmd_cp = 'xcopy /h /fy "%s" ' + out_dir
 file_list = os.popen(cmd_win).read().strip().split('\n')
 import random
-for i in range(56):
+for i in range(16):
     x = random.choice(file_list)
     mp = x.split('\\')[-1]
     cmd_ = cmd_cp % (x,)
     print(cmd_,)
     print(os.popen(cmd_))
-
 ##
 import os, time
 import cv2
@@ -59,9 +58,9 @@ def devide_v(ss, t, file, postfix='.wmv'):
     return output_f
 
 
-os.chdir('G:\\')
-fname = '''你的名字HD'''
-of = devide_v('00:20:12.03', 60*2, fname, '.mp4')
+os.chdir('I:\番剧相关')
+fname = '''Re.Zero.kara.Hajimeru.Isekai.Seikatsu.Memory.Snow.2018.OVA.BDrip.1080p.CHS.AVC.AAC-Mabors'''
+of = devide_v('00:08:15.03', 60*2, fname, '.mp4')
 cap = cv2.VideoCapture(of)
 cv2.namedWindow("frame", 0)
 # cv2.resizeWindow("frame", 640, 480)
