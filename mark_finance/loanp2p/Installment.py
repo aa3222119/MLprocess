@@ -46,8 +46,7 @@ class MonthInstallment:
         """
         等额本息
         """
-        left_ = self.corpus
-        left_ = left_ * (1 + self.m_rate) ** self.first_period_rate - abc.x  # 第一个月的剩余
+        left_ = self.corpus * (1 + self.m_rate) ** self.first_period_rate - abc.x  # 第一个月的剩余
         for i in range(1, self.periods):
             left_ = left_ * (1 + self.m_rate) - abc.x
         return_x = solve(left_, [abc.x])  # 解方程剩余应还金额为0，求得未知数abc.x
@@ -58,5 +57,5 @@ class MonthInstallment:
 if __name__ == '__main__':
     print(__name__)
     # from mark_finance.loanp2p.Installment import *
-    # mo = MonthInstallment(30000,6,0.07,1.13)
-    # mo.equal_corpus()
+    mo = MonthInstallment(30000,6,0.07,1.13)
+    mo.equal_corpus()
