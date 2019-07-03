@@ -36,19 +36,19 @@ class MonthInstallment:
         """
         return_interest_li, left_ = [], self.corpus
         for i in range(self.periods):
-            return_interest_li += [left_ * self.m_rate]
-            left_ -= self.m_corpus_return
+            return_interest_li += [left_ * self.m_rate]  # 每期对应的利息，注意等额本金是每期都把利息还完了
+            left_ -= self.m_corpus_return                # 剩余应还本息，相当于只考虑本金部分每期应还的部分
         return_interest_li[0] *= self.first_period_rate  # 对第一个月的应还利息做first_period_rate的修正
         self.return_li = [x + self.m_corpus_return for x in return_interest_li]
         return self.return_li
 
     def equal_corpus_interest(self):
         """
-        等额本息
+        等额本息，比较常用，似乎是贷款的默认计算方式，无论银行还是网贷主要应用等额本息
         """
-        left_ = self.corpus * (1 + self.m_rate) ** self.first_period_rate - abc.x  # 第一个月的剩余
+        left_ = self.corpus * (1 + self.m_rate) ** self.first_period_rate - abc.x  # 剩余应还本息，这里先计算第一个月
         for i in range(1, self.periods):
-            left_ = left_ * (1 + self.m_rate) - abc.x
+            left_ = left_ * (1 + self.m_rate) - abc.x  # abc.x为未知数：每月应还金额，注意到等额本息每期金额是一样的
         return_x = solve(left_, [abc.x])  # 解方程剩余应还金额为0，求得未知数abc.x
         self.return_li = [return_x[0] for x in range(self.periods)]
         return self.return_li
