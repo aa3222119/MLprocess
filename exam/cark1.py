@@ -49,18 +49,26 @@ import os, time
 import cv2
 
 
-def devide_v(ss, t, file, postfix='.wmv'):
-    cmd = 'ffmpeg -ss %s -t %s -accurate_seek -i "%s" -codec copy "%s"'
+def devide_v(ss, t, file, postfix='.wmv', au_channel=0):
+    # cmd = 'ffmpeg -ss %s -t %s -accurate_seek -i "%s" -codec copy "%s"'
     input_f = file + postfix
-    output_f = file + 'cut' + time.strftime('%Y%m%d_%H%M%S') + postfix
-    print(os.popen(cmd %(ss, t, input_f, output_f)).read())
+    container = '-codec copy'
+    if postfix == '.rmvb':
+        postfix = '.mp4'
+        container = ''
+    au_state = f'-map 0:a:{au_channel}'  # 音轨参数，默认第一个也可以不写
+    vi_state = '-map 0:v'
+    output_f = file + '_cut_' + time.strftime('%Y%m%d_%H%M%S') + postfix
+    cmd = f'ffmpeg -ss {ss} -t {t} -accurate_seek -i "{input_f}" {vi_state} {au_state} {container} "{output_f}"'
+    print(os.popen(cmd).read())
     # os.popen(output_f).read()
     return output_f
 
 
-os.chdir('I:\番剧相关')
-fname = '''Re.Zero.kara.Hajimeru.Isekai.Seikatsu.Memory.Snow.2018.OVA.BDrip.1080p.CHS.AVC.AAC-Mabors'''
-of = devide_v('00:08:15.03', 60*2, fname, '.mp4')
+os.chdir('C:\迅雷下载\\16278482\cut2')
+fname = '''[HoneyGod] 言叶之庭 言の葉の庭 The Garden of Words[x264_10bit][粤日双语][BDrip_1080p]'''
+of = devide_v('00:34:00.00', 360, fname, '.mkv')
+
 cap = cv2.VideoCapture(of)
 cv2.namedWindow("frame", 0)
 # cv2.resizeWindow("frame", 640, 480)
