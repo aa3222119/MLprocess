@@ -28,8 +28,9 @@ from exam.cark_funcs import *
 # cark playground
 
 # mv_concat2("C:\\迅雷下载\\16278482\\cut2", mv_nums=5)
-mv_concat3("C:\\迅雷下载\\16278482\\cut2", mv_nums=5)
+mv_concat3("Z:\\process_area", mv_nums=78, ts_dir='C:\\迅雷下载\\ts\\')
 
+gen_dev_v('2-1Q123222322', '000726', dev_secs=60, f_dir="C:\\迅雷下载\\16278482\\cut2")
 # -------------------------------------------------------
 import requests, json
 r = requests.get('http://apis.juhe.cn/oil/region?key=b17d61a3d33c0cf5b38dc04f51d6ad5d&city=襄阳市')
@@ -55,28 +56,6 @@ for i in range(16):
 ##
 
 
-def devide_v(ss, t, file, postfix='.wmv', au_channel=0):
-    # cmd = 'ffmpeg -ss %s -t %s -accurate_seek -i "%s" -codec copy "%s"'
-    input_f = file + postfix
-    container = '-codec copy'
-    if postfix == '.rmvb':
-        postfix = '.mp4'
-        container = ''
-    au_state = f'-map 0:a:{au_channel}'  # 音轨参数，默认第一个也可以不写
-    vi_state = '-map 0:v'
-    output_f = file + '_cut_' + time.strftime('%Y%m%d_%H%M%S') + postfix
-    cmd = f'ffmpeg -ss {ss} -t {t} -accurate_seek -i "{input_f}" {vi_state} {au_state} {container} "{output_f}"'
-    print(os.popen(cmd).read())
-    # os.popen(output_f).read()
-    return output_f
-
-
-def gen_dev_v(f_name, time_str='000010', format_='.mp4', dev_secs=60, f_dir="C:\\迅雷下载\\16278482\\cut2"):
-    os.chdir(f_dir)
-    return devide_v('%s:%s:%s.01' % (time_str[:2], time_str[2:4], time_str[4:]), dev_secs, f_name, format_)
-
-
-gen_dev_v('2-1G212095145', '000414', dev_secs=60, )
 
 import cv2
 cap = cv2.VideoCapture(of)
