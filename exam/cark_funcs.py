@@ -2,25 +2,30 @@ from buildings.comm_across import *
 import random
 
 
-def devide_v(ss, t, file, postfix='.wmv', au_channel=0):
+def devide_v(ss, t, file, postfix='.wmv', au_channel=0, vi_channel=0):
     # cmd = 'ffmpeg -ss %s -t %s -accurate_seek -i "%s" -codec copy "%s"'
     input_f = file + postfix
     container = '-codec copy'
-    if postfix == '.rmvb':
-        postfix = '.mp4'
+    if postfix in ['.rmvb', '.mpg', '.avi', '.mkv']:
         container = ''
-    au_state = f'-map 0:a:{au_channel}'  # 音轨参数，默认第一个也可以不写
-    vi_state = '-map 0:v'
+    if postfix in ['.rmvb', '.mpg', '.avi', '.mkv']:  #
+        postfix = '.mp4'
+    au_state = f'-map 0:{au_channel} -c:a copy' if au_channel >= 0 else ''  # 音轨参数，默认第一个也可以不写
+    vi_state = f'-map 0:{vi_channel} -c:v copy'
     output_f = file + '_cut_' + time.strftime('%Y%m%d_%H%M%S') + postfix
-    cmd = f'ffmpeg -ss {ss} -t {t} -accurate_seek -i "{input_f}" {vi_state} {au_state} {container} "{output_f}"'
-    print(os.popen(cmd).read())
+    cmd = f'ffmpeg -ss {ss} -t {t} -accurate_seek -i "{input_f}" {vi_state} {container} {au_state} "{output_f}"'
+    print(cmd)
+    try_cmd(cmd)
+    # print(os.popen(cmd).read())
     # os.popen(output_f).read()
     return output_f
 
 
-def gen_dev_v(f_name, time_str='000010', format_='.mp4', dev_secs=60, f_dir="C:\\迅雷下载\\16278482\\cut2"):
+def gen_dev_v(f_name, time_str='000010', format_='.mp4', dev_secs=60, f_dir="C:\\迅雷下载\\16278482\\cut2", au_channel=0,
+              vi_channel=0):
     os.chdir(f_dir)
-    return devide_v('%s:%s:%s.01' % (time_str[:2], time_str[2:4], time_str[4:]), dev_secs, f_name, format_)
+    return devide_v('%s:%s:%s' % (time_str[:2], time_str[2:4], time_str[4:]), dev_secs, f_name, format_,
+                    au_channel=au_channel, vi_channel=vi_channel)
 
 
 def write_sth_in_file(content, file_name, mode='w'):
@@ -53,25 +58,28 @@ def mv_concat2(process_dir, mv_nums=5, postfix='.mp4'):
     return try_cmd(cmd_ss)
 
 
-def mv_concat3(process_dir, mv_nums=5, postfix='.mp4', ts_dir=''):
+def mv_concat3(process_dir, mv_nums=5, postfix='.mp4', ts_dir='', with_shuffle=False):
     """
 
     :param process_dir:
     :param mv_nums:
     :param postfix:
     :param ts_dir:
+    :param with_shuffle:
     :return:
     """
     mv_li = findall_in_dir(postfix, path=process_dir, include_dir=True)
-    random.shuffle(mv_li)
+    if with_shuffle:
+        random.shuffle(mv_li)
     cmd_to_ts_ = 'ffmpeg -i "%s" -c copy -bsf:v h264_mp4toannexb -f mpegts %s -y'
     ts_dir = ts_dir if ts_dir else f'{process_dir}\\ts_video\\'
     iter_mkdir(ts_dir)
     for i in range(mv_nums):
-        print(i, )
-        try_cmd(cmd_to_ts_ % (mv_li[i], f'{ts_dir}f{i}.ts'))
+        cmd_s = cmd_to_ts_ % (mv_li[i], f'{ts_dir}f{i}.ts')
+        print(i, cmd_s)
+        try_cmd(cmd_s)
     concat_vi_ss = '|'.join([f'{ts_dir}f{i}.ts' for i in range(mv_nums)])
-    out_ = f'{ts_dir}join_' + time.strftime('%Y%m%d_%H%M%S') + postfix
+    out_ = f'{ts_dir}join_' + time.strftime('%Y%m%d_%H%M%S') + '.mp4'
     # cmd_ss = f'ffmpeg -i "concat:{concat_vi_ss}"  -c copy -bsf:a aac_adtstoasc -movflags +faststart {out_}'
     # cmd_ss = f'ffmpeg -i "concat:{concat_vi_ss}"  -c copy -bsf:a aac_adtstoasc {out_}'
     cmd_ss = f'ffmpeg -i "concat:{concat_vi_ss}"  -c copy {out_}'
