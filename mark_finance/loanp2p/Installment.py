@@ -29,7 +29,6 @@ class MonthInstallment:
         self.m_corpus_return = corpus/periods            # 每期应还本金
         self.return_li = []                              # 应还列表
 
-
     def equal_corpus(self):
         """
         等额本金
