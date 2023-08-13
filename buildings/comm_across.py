@@ -1,6 +1,5 @@
 # 跨平台实用方法
 
-import shutil
 import os
 import time
 import datetime
@@ -10,9 +9,40 @@ import logging
 import re
 import pickle
 import sys
+
 # 最好还是用python3.6
 
 running_dir = os.getcwd()  # 多数情形下即是项目目录
+
+
+def goto_script_dir(full_script_name=sys.argv[0]):
+    exec_dir = os.path.dirname(full_script_name)
+    print(f'切换当前目录(os.chdir): go to =>({exec_dir})', os.chdir(exec_dir))
+
+
+def print_wf(ss):
+    """
+    print with flush
+    :param ss:
+    :return:
+    """
+    sys.stdout.write('\r' + ss)
+    sys.stdout.flush()
+
+
+def general_console_safe(funcs_li):
+    console_li = [f.__name__ for f in funcs_li]
+    print(day_forpast(0, ss='%Y-%m-%d %H:%M:%S'), 'hello console %s' % sys.path[0], sys.argv)
+    print('use cons to start, standby tasks are :', console_li)
+    if len(sys.argv) >= 2:
+        if sys.argv[1] == 'cons' and sys.argv[2:]:
+            assert sys.argv[2] in console_li, f'{sys.argv[2]} not in standby funcs'
+            # 适应调度框架: 去掉 --开头的参数
+            args_li = [x for x in sys.argv[3:] if '--' not in x]
+            return f"{sys.argv[2]}({', '.join(args_li)})"
+        else:
+            print('please use keyword cons, and have expression after that~')
+    print(day_forpast(0, ss='%Y-%m-%d %H:%M:%S'), 'done')
 
 
 def general_console(funcs_li):
@@ -33,10 +63,11 @@ def general_console(funcs_li):
 
 def iter_mkdir(path):
     """
-    能够迭代的建立文件夹 path = /A/B/C/ 则会用迭代的方式先保证/A/B/存在 ;最好以/结尾 若path = /A/B/C/asdf 则只新建文件夹到/A/B/C/
-    2019年10月16日11:54:15 : 更新 /被替换为 os.sep
-    :param path:
-    :return:
+        能够迭代的建立文件夹 path = /A/B/C/ 则会用迭代的方式先保证/A/B/存在 ;
+        最好以/结尾 若path = /A/B/C/asdf 则只新建文件夹到/A/B/C/
+        2019年10月16日11:54:15 : 更新 /被替换为 os.sep 兼容win下
+        :param path:
+        :return:
     """
     # path = re.match('(.*)/+', path).group(1)
     # path = re.match('(.*)' + os.sep + '+', path).group(1)
@@ -52,6 +83,12 @@ def iter_mkdir(path):
                 os.mkdir(path)
             else:
                 print('no need to (iter)mkdir~')
+
+
+def text2file(text_, file_name):
+    iter_mkdir(file_name)
+    with open(file_name, "w") as f:
+        f.write(text_)
 
 
 class VHolder:
@@ -123,7 +160,7 @@ class Logger:
         return self
 
 
-def datetime_format(a_datetime, ss):
+def datetime_format(a_datetime, ss="%Y%m%d"):
     if ss == 'stamp':
         return time.mktime(a_datetime.timetuple())
     elif ss == 'Timestamp':
@@ -132,8 +169,17 @@ def datetime_format(a_datetime, ss):
         return a_datetime.strftime(ss)
 
 
-def day_forpast(d=0, h=0, ss="%Y%m%d"):
-    curr_time = datetime.datetime.now()
+def day_forpast(d=0, h=0, ss="%Y%m%d", curr_time=None):
+    """
+    平移时间，写forpast是老代码遗留问题，也可找未来，缺点是datetime.timedelta的参数不能用month
+    :param d:
+    :param h:
+    :param ss:
+    :param curr_time: 需要 datetime.datetime 结构
+    :return:
+    """
+    if curr_time is None:
+        curr_time = datetime.datetime.now()
     t1 = curr_time + datetime.timedelta(days=d, hours=h)
     return datetime_format(t1, ss)
 
@@ -149,16 +195,31 @@ def time_replace(rep_dict=None, ss='stamp', curr_time=None):
 
 
 # 某月的(倒数)第-n天 ym_dict 不传表示当前月
-def lastnday_of_month(ym_dict=None, n=0, ss='stamp'):
+def lastnday_of_month(ym_dict=None, n=0, ss='%Y%m%d'):
     import calendar
     if ym_dict is None:
         ym_dict = {}
     now = datetime.datetime.now()
-    cyear = ym_dict['year'] if 'year' in ym_dict else now.year
-    cmonth = ym_dict['month'] if 'month' in ym_dict else now.month
-    days = calendar.monthrange(cyear, cmonth)
+    c_year = ym_dict['year'] if 'year' in ym_dict else now.year
+    c_month = ym_dict['month'] if 'month' in ym_dict else now.month
+    days = calendar.monthrange(c_year, c_month)
     ym_dict.update({'day': days[-1] + n})
     return time_replace(ym_dict, ss)
+
+
+def last_nd_of_month(curr_time=None, n=0, ss='%Y%m%d'):
+    """
+    时间替换成一个月的倒数n天的时间，默认最后一天
+    :param curr_time: 需要 datetime.datetime 结构
+    :param n: -1 表示倒数第1天再减一天
+    :param ss:
+    :return:
+    """
+    import calendar
+    if curr_time is None:
+        curr_time = datetime.datetime.now()
+    days = calendar.monthrange(curr_time.year, curr_time.month)
+    return time_replace({'day': days[-1] + n}, ss, curr_time)
 
 
 # 获取curr_time的上月最后一天的一种方法 curr_time不传时为当前时间
@@ -202,10 +263,10 @@ class Timer:
         time.sleep(n)
         return self
 
-    def runtime_delay(self, deltasecond=1):
-        if deltasecond < 0:
-            print(day_forpast(0, ss='%Y-%m-%d %H:%M:%S'), '需要等待%s秒以继续....' % (-deltasecond), )
-            self.sleep(-deltasecond)
+    def runtime_delay(self, delta_second=1):
+        if delta_second < 0:
+            print(day_forpast(0, ss='%Y-%m-%d %H:%M:%S'), '需要等待%s秒以继续....' % (-delta_second), )
+            self.sleep(-delta_second)
         return self
 
 
@@ -232,16 +293,17 @@ def findall_in_list(self, content):
         finally:
             pass
     return res_li
+
+
 # list.findall_in_list = findall_in_list  # TypeError: can't set attributes of built-in/extension type 'list'
 
 
-def findall_in_dir(content, path=running_dir, include_dir=True, with_path_prefix=True) -> list:
+def findall_in_dir(content, path=running_dir, include_dir=True) -> list:
     """
 
     :param content: 查找内容
     :param path: 查找的根文件夹
     :param include_dir: 是否返回包含纯文件夹的结果
-    :param with_path_prefix : 是否包含path作为前缀
     :return res_li: list 包含content的列表:
     """
     res_li = []
@@ -249,8 +311,6 @@ def findall_in_dir(content, path=running_dir, include_dir=True, with_path_prefix
         if include_dir:
             res_li += findall_in_list([ro + os.sep + d for d in dirs], content)
         res_li += findall_in_list([ro + os.sep + f for f in files], content)
-    if not with_path_prefix:
-        res_li = [x.replace(path + os.sep, '') for x in res_li]
     return res_li
 
 
@@ -290,14 +350,35 @@ def sha2str(str_, hash_func=hashlib.sha256):
     return hash_func(encoded_str).hexdigest()
 
 
-if __name__ == '__main__':
-    print(shutil)
-    list(content_walker('.proto'))
-    findall_in_dir('.proto')
-    list(content_walker('proto'))
-    findall_in_dir('proto')
+def bit_judge(int_num, lower_bit=0, higher_bit=0):
+    """
+    位标识的判断，输出原始值，比如
+       8 被第3bit判断结果为1 bit_judge(8, 3) = 1
+       7 被12bit判断结果为3 bit_judge(7, 1, 2) = 3
+       7 单独被1/2bit判断结果都1 bit_judge(7, 1, 1) = 1； bit_judge(7, 2) = 1
+    :param int_num: 待判断的int输入
+    :param lower_bit: 连续的开关位低位界
+    :param higher_bit: 连续的开关位高位界
+    :return:
+    """
+    higher_bit = lower_bit if higher_bit == 0 else higher_bit  # 高位不传默认和低位一样
+    re_int = 0
+    for i_ in range(lower_bit, higher_bit + 1):
+        re_int += int_num & (2 ** i_)
+    return re_int >> lower_bit
 
-    list(content_walker('proto'), os.path.dirname(running_dir))
-    findall_in_dir('proto', os.path.dirname(running_dir))
-    list(content_walker('proto'), os.path.dirname(running_dir), include_dir=False)
-    findall_in_dir('proto', os.path.dirname(running_dir), include_dir=False)
+
+def bit_judge_raw(int_num, judge_bit=0b001):
+    """
+    位标识的判断，输出原始值，比如 8 & 0b1001 输出为8
+    :param int_num: 待判断的int输入
+    :param judge_bit: 开关位/关注位
+    :return:
+    """
+    return int_num & judge_bit
+
+
+if __name__ == '__main__':
+    list(content_walker('.py'))
+    findall_in_dir('.py')
+    findall_in_dir('py', os.path.dirname(running_dir), include_dir=False)
