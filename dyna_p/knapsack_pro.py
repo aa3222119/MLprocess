@@ -10,6 +10,7 @@ class KnapsackPro:
         assert self._n == len(kw_li), f'length error'
         self.v_li = kv_li
         self.w_li = kw_li
+        # ret_ 背包问题的状态空间解，解释为前i个物体，体积为j时的最大价值
         self.ret_01 = np.zeros((self._n + 1, 1))  # 0-1 means 单背包问题
         self.ret_0_inf = np.zeros((self._n + 1, 1))  # 0-infinity means 无限背包问题
 

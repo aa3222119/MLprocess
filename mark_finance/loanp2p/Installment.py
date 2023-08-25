@@ -56,5 +56,6 @@ class MonthInstallment:
 if __name__ == '__main__':
     print(__name__)
     # from mark_finance.loanp2p.Installment import *
-    mo = MonthInstallment(30000, 6, 0.07, 1.13)
+    mo = MonthInstallment(100, 60, 0.0405, 1.0)
     mo.equal_corpus()
+    mo.equal_corpus_interest()
