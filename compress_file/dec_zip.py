@@ -6,7 +6,7 @@ import random
 import itertools
 import numpy as np
 import joblib
-import cloudpickle
+# import cloudpickle
 
 # 94
 _charset = ['`', '~', '!', '@', '#', '$', '%', '^', '&', '*', '(', ')', '-', '_', '=', '+', '[', ']', '{', '}', ';',
@@ -114,7 +114,7 @@ class ZipHandler:
         self.default_dir = os.sep.join([self.cur_dir, self.f_name_])
         self.fh_ = zipfile.ZipFile(f_name)
         self.namelist = self.fh_.namelist()
-        self.fir_name = self.namelist[0]
+        self.fir_name = self.namelist[-1]
         self.infolist = self.fh_.infolist()
         self.fir_flag_bits = self.fir_info.flag_bits
         self.cro_flag = self.fir_flag_bits & 0x01
@@ -128,7 +128,7 @@ class ZipHandler:
 
     @property
     def fir_info(self):
-        return self.infolist[0]
+        return self.infolist[-1]
 
     def extractall(self, dir_=None):
         pass
@@ -179,16 +179,16 @@ class ZipHandler:
                 c_cnt_l += sg.cnt_limit
         dt = time.time() - tic
         a4_cra_taken = dt / c_cnt_l * 10000
-        a_sg_taken = dt / sg_times * 10000
+        a_sg_taken = dt / sg_times
         a_sg_cra = c_cnt_l / sg_times
-        tak_s1 = f'{c_cnt_l=} {dt=:.5f} {a4_cra_taken=:.5f} {a_sg_taken=:.5f} {a_sg_cra=:.5f}'
+        tak_s1 = f'{c_cnt_l=} {dt=:.3f} {a4_cra_taken=:.5f} {a_sg_taken=:.5f} {a_sg_cra=}'
         # print(f' {a4_cra_taken=} {a_sg_taken=}')
         print(f' < done {cra_len=}: by {sg_times=}>{sg_cnt_lim:.0f}; {tak_s1}.')
 
     def crack_until(self, charset=None, limit_len=4):
         assert self.cro_flag, 'warning: no need to crack'
         if charset is None:
-            charset = _charset2
+            charset = _charset1
         for cra_len in range(1, limit_len + 1):
             # func_ = cloudpickle.loads(cloudpickle.dumps(self.crack_a_len))
             # joblib.Parallel(n_jobs=-1)(joblib.delayed(func_)(charset, cra_len) for _ in range(cra_len+1))
@@ -201,7 +201,7 @@ class ZipHandler:
             self.fh_aes.close()
 
 
-# -- use demo
+# 23511
 file_name = os.sep.join(['compress_file', 'testing', "uz5.zip"])
 zh5 = ZipHandler(file_name)
 
@@ -211,3 +211,5 @@ zh3 = ZipHandler(file_name)
 zh1 = ZipHandler(os.sep.join(['compress_file', 'testing', "uz1.zip"]))
 zh2 = ZipHandler(os.sep.join(['compress_file', 'testing', "uz2.zip"]))
 zh6 = ZipHandler(os.sep.join(['compress_file', 'testing', "uz6.zip"]))
+
+tt7 = ZipHandler(os.sep.join(['C:\迅雷下载', "tt7.zip"]))

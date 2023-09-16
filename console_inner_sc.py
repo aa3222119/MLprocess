@@ -5,7 +5,7 @@ from compress_file.dec_zip import *
 
 def run_test():
     # p_ = try_cmd("D:\Programs\Python\Python39\python.exe E:/simulate_area/MLprocess/console_inner_sc.py")
-    zh6.crack_until()
+    tt7.crack_until(limit_len=10)
 
 
 if __name__ == "__main__":
