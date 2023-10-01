@@ -15,14 +15,18 @@ def gen_dev_v2(f_name, time_str='000000', format_='.mp4', dev_secs=60, f_dir=Non
         f_name = f'{f_dir}{os.sep}{f_name}'
     f_name_li = f_name.split(os.sep)
     f1_name = f_name_li[-1]
-    if '.' in f1_name[:1]:
-        file_name, format_ = f1_name.split('.')
+    if '.' in f1_name[-5:]:
+        *file_name, format_ = f1_name.split('.')
+        # 文件名还有.的简单处理
+        if type(file_name) is list and len(file_name):
+            file_name = file_name[-1]
     else:
         file_name = f1_name
         f1_name = f1_name + format_
         # todo format_ 仍然不给信息时尝试智能判断？
     if f_dir is None and os.sep in f_name:
         f_dir = os.sep.join(f_name_li[:-1])
+    print(f'{f_name_li=} {f1_name=} {file_name=}')
 
     start_time = h_ * 3600 + m_ * 60 + s_ * 1 + s1_
     # video_path = "135950408.mp4"
