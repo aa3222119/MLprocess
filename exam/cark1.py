@@ -27,7 +27,7 @@ from exam.cark_funcs import *
 
 # cark playground
 
-gen_dev_v2('335599.xyz FSDSS-549.mp4', '012855', dev_secs=59, f_dir="/Users/hanxuechen/Downloads/need_to_move")
+gen_dev_v2('', '011350', dev_secs=60, f_dir="/Users/hanxuechen/Downloads/need_to_move")
 gen_dev_v('2-1Q123222322', '000726', dev_secs=60, f_dir="C:\\迅雷下载\\16278482\\cut2")
 
 # mv_concat2("C:\\迅雷下载\\16278482\\cut2", mv_nums=5)

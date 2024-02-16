@@ -2,15 +2,25 @@ from buildings.comm_across import *
 import random
 from moviepy.editor import *
 from moviepy.video.io.ffmpeg_tools import ffmpeg_extract_subclip
+import Cocoa
+# 获取剪贴板数据
 
 
-def gen_dev_v2(f_name, time_str='000000', format_='.mp4', dev_secs=60, f_dir=None, format_o='.mp4'):
+def get_clipboard():
+    pb = Cocoa.NSPasteboard.generalPasteboard()
+    contents = pb.stringForType_(Cocoa.NSStringPboardType)
+    return contents
+
+
+def gen_dev_v2(f_name='', time_str='000000', format_='.mp4', dev_secs=60, f_dir=None, format_o='.mp4'):
     s1_ = 0
     h_, m_, s_ = 0, 0, 0
     if len(time_str) == 6 and '.' not in time_str:
         h_, m_, s_ = int(time_str[:2]), int(time_str[2:4]), int(time_str[4:6])
     # todo about s1_
 
+    if f_name == '':
+        f_name = get_clipboard()
     if f_dir and os.sep not in f_name:
         f_name = f'{f_dir}{os.sep}{f_name}'
     f_name_li = f_name.split(os.sep)
