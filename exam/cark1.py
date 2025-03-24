@@ -3,18 +3,20 @@
 from exam.cark_funcs import *
 
 
+file_name = '''aavv36.xyz@nyoshin-n2356'''
+# f_dir = 'C:\\迅雷下载\\ts1'  #
+f_dir = 'Z:\\remain_do'
+
+gen_dev_v(file_name, '002530', dev_secs=60, f_dir=f_dir, format_='.mp4', au_channel=0, vi_channel=1)
+
+
 # gen_dev_v('1', '000000', dev_secs=29, f_dir="C:\\迅雷下载\\ts", format_='.mp4', au_channel=0)
 #
 # # mv_concat2("C:\\迅雷下载\\16278482\\cut2", mv_nums=5)
-mv_concat3("Z:\\process_area\\", mv_nums=96, postfix='1', ts_dir='C:\\迅雷下载\\ts\\', with_shuffle=True)
+mv_concat3("Z:\\process_area\\", mv_nums=99, postfix='.mp4', ts_dir='C:\\迅雷下载\\ts\\', with_shuffle=True)
 #
 # # name_ = '[HoneyGod] 言叶之庭 言の葉の庭 The Garden of Words[x264_10bit][粤日双语][BDrip_1080p]'
 # # gen_dev_v(name_, '001907', format_='.mkv', dev_secs=71, f_dir="Y:\\番剧相关")
-
-
-file_name = '''heyzo-2886'''
-f_dir = 'Y:\\th'  # Y:\\恋上换装__ 1440p
-gen_dev_v(file_name, '002951', dev_secs=27, f_dir=f_dir, format_='.mp4', au_channel=0, vi_channel=1)
 
 
 # -------------------------------------------------------

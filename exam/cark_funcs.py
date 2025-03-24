@@ -24,6 +24,7 @@ def devide_v(ss, t, file, postfix='.wmv', au_channel=0, vi_channel=0):
 def gen_dev_v(f_name, time_str='000010', format_='.mp4', dev_secs=60, f_dir="C:\\迅雷下载\\16278482\\cut2", au_channel=0,
               vi_channel=0):
     os.chdir(f_dir)
+    time_str = time_str[-6:]
     return devide_v('%s:%s:%s' % (time_str[:2], time_str[2:4], time_str[4:]), dev_secs, f_name, format_,
                     au_channel=au_channel, vi_channel=vi_channel)
 
