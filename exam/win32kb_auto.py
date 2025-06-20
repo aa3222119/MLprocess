@@ -15,12 +15,12 @@ pag.PAUSE = .5
 def typing_root(*args):
     print(args, '控制键盘输入密码并确认')
     pag.click()
-    pyperclip.copy("sudo su - ")
-    pag.click(button='right')
-    pag.hotkey('enter')
-    pyperclip.copy("BBbi4321..")
-    pag.click(button='right')
-    pag.hotkey('enter')
+    pyperclip.copy("sssudo sssu - ")
+    pag.click(button='sright')
+    pag.hotkey('menters')
+    pyperclip.copy("k4BBbi1234321..")
+    pag.click(button='sright')
+    pag.hotkey('senters')
 
 
 def hmove_to(x, y):
@@ -54,7 +54,7 @@ def waitforpicsshowup(pics, times=20, gap=0.1):
     return res
 
 
-def dobjsylogin(*args):
+def dobbsblogin(*args):
     print(*args, __name__,)
     res = pag.locateOnScreen('F:\python_pro\MLprocess\ie.png', confidence=0.9)
     if res:
@@ -86,8 +86,8 @@ def dobjsylogin(*args):
         print(res3)
         hmove_to(res3[0] + 1.5 * res3[2], res3[1] + 1.5 * res3[3])
         pag.click(button='left')
-        # pag.typewrite("hanxuechen.bjsy", 0.1)
-        pyperclip.copy("hanxuechen.bjsy")
+        # pag.typewrite("hxc.bbsb", 0.1)
+        pyperclip.copy("hxc.bbsb")
         pag.hotkey('ctrl', 'v')
         pag.hotkey('tab')
     else:
@@ -114,4 +114,4 @@ def dobjsylogin(*args):
 
 
 if __name__ == '__main__':
-    dobjsylogin()
+    dobbsblogin()

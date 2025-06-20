@@ -68,5 +68,3 @@ def sc_pic():
             link_ = a_link.get('href')
             res_1 = sess.get(f'https://www.bthy.xyz{link_}', headers={})
             soup_1 = BeautifulSoup(res_1.text)
-
->>>>>>> 472b35acfcb644de6c963ca5e44e0f77b129683a
