@@ -73,9 +73,9 @@ def dobbsblogin(*args):
         # win32api.SetCursorPos((x, y))
         pag.mouseDown()
         pag.mouseUp()
-        pyperclip.copy("https://fort.sinopec.com/iam/login.jsp")
+        pyperclip.copy("https://sfok4rts.simnk4opk4ec.com/iam/login.jsp")
         pag.hotkey('ctrl', 'v')
-        # pag.typewrite("https://fort.sinopec.com/iam/login.jsp", 0.1)
+        # pag.typewrite("https://sfok4rts.simnk4opk4ec.com/iam/login.jsp", 0.1)
         pag.hotkey('enter')
     else:
         return -1
