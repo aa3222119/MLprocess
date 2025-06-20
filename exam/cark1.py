@@ -27,10 +27,12 @@ from exam.cark_funcs import *
 
 # cark playground
 
+gen_dev_v2('', '011350', dev_secs=60, f_dir="/Users/hanxuechen/Downloads/need_to_move")
+gen_dev_v('2-1Q123222322', '000726', dev_secs=60, f_dir="C:\\迅雷下载\\16278482\\cut2")
+
 # mv_concat2("C:\\迅雷下载\\16278482\\cut2", mv_nums=5)
 mv_concat3("Z:\\process_area", mv_nums=78, ts_dir='C:\\迅雷下载\\ts\\')
 
-gen_dev_v('2-1Q123222322', '000726', dev_secs=60, f_dir="C:\\迅雷下载\\16278482\\cut2")
 # -------------------------------------------------------
 import requests, json
 r = requests.get('http://apis.juhe.cn/oil/region?key=b17d61a3d33c0cf5b38dc04f51d6ad5d&city=襄阳市')
